@@ -1,1 +1,1 @@
-ls -l | perl -lne 'if ($.>1) {$_=~ s/\s+/;/g; my @sp=split(/;/,$_,0); my $name=$sp[0]; my $t=";"; for (my $i=1; $i<(scalar @sp); $i++) {if ($i>8) {$t=" "};  $name=$name.$t.$sp[$i]}; print $name}' | cat > 'result'
+ls -l | perl -lne 'if ($.>1) {for (my $i=1; $i<9; $i+=1) {$_=~ s/\s+/;/}; print $_}' | cat > result
