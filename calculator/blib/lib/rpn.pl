@@ -26,8 +26,8 @@ sub priority {
 	return
 		$op eq '+' || $op eq '-' ? 1 :
 		$op eq '*' || $op eq '/' ? 2 :
+		$op eq 'U+' || $op eq 'U-' ? 3 :
 		$op eq '^' ? 3 :
-		$op eq 'U+' || $op eq 'U-' ? 4 :
 		-1;
 }
 
@@ -53,7 +53,7 @@ sub rpn {
 					$temp = pop @ops;
 				}
 			}
-			when ([ 'U+', 'U-', '^' ]){
+			when ([ 'U+', 'U-', '^']){
 				if (scalar @ops > 0) {
 					while (priority($x) < priority(@ops[scalar @ops - 1])) {
 						$temp = pop @ops;
