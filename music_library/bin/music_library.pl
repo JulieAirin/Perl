@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use Local::MusicLibrary qw/form_library check_params/;
+use Local::MusicLibrary qw/check_params/;
+use Local::MusicLibrary::LibraryPrinter qw/form_library/;
 use Getopt::Long;
 use Pod::Usage;
 use DDP;
@@ -12,7 +13,7 @@ GetOptions($param, 'band=s', 'year=i', 'track=s', 'album=s', 'format=s', 'sort=s
   or pod2usage();
 
 pod2usage unless (check_params($param));
-pod2usage if (${$param}{help});
+pod2usage if ($param->{help});
 
 my @library;
 while (<>) {

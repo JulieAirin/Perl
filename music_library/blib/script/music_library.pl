@@ -12,7 +12,7 @@ GetOptions($param, 'band=s', 'year=i', 'track=s', 'album=s', 'format=s', 'sort=s
   or pod2usage();
 
 pod2usage unless (check_params($param));
-pod2usage if (${$param}{help});
+pod2usage if ($param->{help});
 
 my @library;
 while (<>) {
