@@ -186,15 +186,15 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/Local/MusicLibrary.pm \
-	lib/Local/MusicLibrary/LibraryFormater.pm \
-	lib/Local/MusicLibrary/LibraryPrinter.pm
+	lib/Local/MusicLibrary/IO.pm \
+	lib/Local/MusicLibrary/Processor.pm
 
 PM_TO_BLIB = lib/Local/MusicLibrary.pm \
 	blib/lib/Local/MusicLibrary.pm \
-	lib/Local/MusicLibrary/LibraryFormater.pm \
-	blib/lib/Local/MusicLibrary/LibraryFormater.pm \
-	lib/Local/MusicLibrary/LibraryPrinter.pm \
-	blib/lib/Local/MusicLibrary/LibraryPrinter.pm
+	lib/Local/MusicLibrary/IO.pm \
+	blib/lib/Local/MusicLibrary/IO.pm \
+	lib/Local/MusicLibrary/Processor.pm \
+	blib/lib/Local/MusicLibrary/Processor.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -497,7 +497,7 @@ realclean_subdirs :
 # Delete temporary files (via clean) and also delete dist files
 realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
-	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
+	  $(FIRST_MAKEFILE) $(MAKEFILE_OLD) 
 	- $(RM_RF) \
 	  $(DISTVNAME) 
 
@@ -857,8 +857,8 @@ ppd :
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  lib/Local/MusicLibrary.pm blib/lib/Local/MusicLibrary.pm \
-	  lib/Local/MusicLibrary/LibraryFormater.pm blib/lib/Local/MusicLibrary/LibraryFormater.pm \
-	  lib/Local/MusicLibrary/LibraryPrinter.pm blib/lib/Local/MusicLibrary/LibraryPrinter.pm 
+	  lib/Local/MusicLibrary/IO.pm blib/lib/Local/MusicLibrary/IO.pm \
+	  lib/Local/MusicLibrary/Processor.pm blib/lib/Local/MusicLibrary/Processor.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

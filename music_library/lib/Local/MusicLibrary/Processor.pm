@@ -1,12 +1,12 @@
-package Local::MusicLibrary::LibraryFormater;
+package Local::MusicLibrary::Processor;
 
 use strict;
 use warnings;
 use Exporter 'import';
 
-our @EXPORT = qw/format_library/;
+our @EXPORT = qw/process_keys/;
 
-sub format_library ($$) {
+sub process_keys ($$) {
   my $param = shift;
   my $libref = shift;
   my $key;

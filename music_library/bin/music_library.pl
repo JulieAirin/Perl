@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 use Local::MusicLibrary qw/check_params/;
-use Local::MusicLibrary::LibraryPrinter qw/form_library/;
+use Local::MusicLibrary::Processor qw/process_keys/;
+use Local::MusicLibrary::IO qw/get_library print_library/;
 use Getopt::Long;
 use Pod::Usage;
 use DDP;
@@ -15,12 +16,14 @@ GetOptions($param, 'band=s', 'year=i', 'track=s', 'album=s', 'format=s', 'sort=s
 pod2usage unless (check_params($param));
 pod2usage if ($param->{help});
 
-my @library;
+my @data;
 while (<>) {
-  push @library, $_;
+  push @data, $_;
 }
 
-form_library($param,@library);
+my $libref = get_library ($param, @data);
+process_keys ($param, $libref);
+print_library ($param, $libref);
 
 =head1 SYNOPSIS
 

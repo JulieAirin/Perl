@@ -1,13 +1,13 @@
-package Local::MusicLibrary::LibraryPrinter;
+package Local::MusicLibrary::IO;
 
 use strict;
 use warnings;
-use Local::MusicLibrary::LibraryFormater qw/format_library/;
+use Local::MusicLibrary::Processor qw/process_keys/;
 use Exporter 'import';
 
-our @EXPORT = qw/form_library print_library/;
+our @EXPORT = qw/get_library print_library/;
 
-sub form_library ($@) {
+sub get_library ($@) {
   my $param = shift;
   my @data = @_;
   my @lib;
@@ -29,8 +29,7 @@ sub form_library ($@) {
     }x;
     push @lib, { band => $+{band}, year => $+{year}, album => $+{album}, track => $+{track}, format => $+{format} };
   }
-  format_library ($param,\@lib);
-  print_library ($param,\@lib);
+  return \@lib;
 }
 
 sub print_library ($$) {

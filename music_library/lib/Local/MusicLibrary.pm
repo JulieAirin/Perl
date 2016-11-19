@@ -2,8 +2,6 @@ package Local::MusicLibrary;
 
 use strict;
 use warnings;
-use Local::MusicLibrary::LibraryFormater qw/format_library/;
-use Local::MusicLibrary::LibraryPrinter qw/print_library/;
 use Exporter 'import';
 
 our @EXPORT = qw/check_params/;
