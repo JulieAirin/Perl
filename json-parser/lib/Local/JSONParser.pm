@@ -9,6 +9,7 @@ our @EXPORT = qw( parse_json test_source );
 
 use DDP;
 use Encode;
+use utf8;
 
 sub hash {
 	my $source = shift;
@@ -17,7 +18,7 @@ sub hash {
 	my $value;
 	while ($source =~ /
 		(?<key>"(?:\\["\/bfnrt]
-    	|\\u[0-9a-fA-f]{4}
+    	|\\u[0-9a-fA-F]{4}
 			|\w
 			|\s
 			|\,
@@ -29,9 +30,11 @@ sub hash {
 		|\[.*\]
 		|("
 			(?:\\["\/bfnrt]
-    	|\\u[0-9a-fA-f]{4}
+    	|\\u[0-9a-fA-F]{4}
 			|\w
 			|\s
+			|\d
+			|@|\{|\}|\[|\]|:|\+
 			|\,
 			)*
 		")
@@ -39,7 +42,7 @@ sub hash {
 		|true
 		|false
 		|null
-		)( \,{1}|$ )/gx) {
+		)( \,?|$ )/gx) {
 			$key = test_source($+{key});
 			$value = test_source($+{value});
 			if (ref $value eq "HASH") {
@@ -63,17 +66,19 @@ sub array {
 		|\[.*\]
 		|("
 			(?:\\["\/bfnrt]
-    	|\\u[0-9a-fA-f]{4}
+    	|\\u[0-9a-fA-F]{4}
 			|\w
 			|\s
+			|\d
 			|\,
+			|@|\{|\}|\[|\]|:|\+
 			)*
 			")
 		|-{0,1}([1-9][0-9]*|0)(\.[0-9]*){0,1}([eE][\+-]{0,1}[0-9]){0,1}
 		|true
 		|false
 		|null
-		)( \,{1}|$ )/gx) {
+		)( ,?|$ )/gx) {
 			$value = test_source($+{value});
 			if (ref $value eq "HASH") {
 				push @res, $value;
@@ -90,13 +95,23 @@ sub string {
 	my $source = shift;
 	$source =~ /"
 		((\\["\/bfnrt]
-		|\\u[0-9a-fA-f]{4}
+		|\\u[0-9a-fA-F]{4}
 		|\w
+		|\d
 		|\s
-		|\,
+		|@|\{|\}|\[|\]|:|\+|\,
 		)*)
 		"/x;
-	return $1;
+	my $res = $1;
+	$res =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/eg;
+	$res =~ s/(\\b)/chr(8)/eg;
+	$res =~ s/(\\f)/chr(12)/eg;
+	$res =~ s/(\\n)/chr(10)/eg;
+	$res =~ s/(\\r)/chr(13)/eg;
+	$res =~ s/(\\t)/chr(9)/eg;
+	$res =~ s/\\"/"/g;
+	$res =~ s/\\\//\//g;
+	return $res;
 }
 
 sub number {
@@ -118,9 +133,11 @@ sub test_source {
 		return \@ares;
 	} elsif ( $source =~ /^"
 		((\\["\/bfnrt]
-		|\\u[0-9a-fA-f]{4}
+		|\\u[0-9a-fA-F]{4}
 		|\w
 		|\s
+		|\d
+		|@|\{|\}|\[|\]|:|\+
 		|\,
 		)*)"$/xs ) {
 		$res = string ($1);
@@ -135,9 +152,9 @@ sub test_source {
 
 sub parse_json {
 	my $source = shift;
-	my $res = test_source ($source);
+	my $res = test_source (decode("utf-8",$source));
 	#use JSON::XS;
-	# return JSON::XS->new->utf8->decode($source);
+	#return JSON::XS->new->utf8->decode($source);
 	return $res;
 }
 
