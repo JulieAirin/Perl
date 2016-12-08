@@ -2,6 +2,5 @@
   "key1": "string value",
   "key2": -3.1415,
   "key3": ["nested array"],
-  "key4": { "nested": "object" },
-  "key5": -12
+  "key4": { "nested": "object" }
 }

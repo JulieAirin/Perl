@@ -15,4 +15,4 @@ my $diff_reducer = Local::Reducer::MaxDiff->new(
     initial_value => 0,
 );
 
-my $diff_result;
+print $diff_reducer->reduce_n(1);;

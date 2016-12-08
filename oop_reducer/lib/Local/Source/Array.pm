@@ -29,7 +29,7 @@ sub next {
     $self->{cur_index} += 1;
     return ${$self->array}[$self->cur_index];
   } else {
-    return 'undef';
+    return undef;
   }
 }
 

@@ -4,6 +4,7 @@ use strict;
 use Local::TCP::Calc;
 use Local::TCP::Calc::Server::Queue;
 use Local::TCP::Calc::Server::Worker;
+use IO::Socket;
 
 my $max_worker;
 my $in_process = 0;
@@ -20,10 +21,11 @@ $SIG{CHLD} = \&REAPER;
 
 sub start_server {
 	my ($pkg, $port, %opts) = @_;
-	$max_worker         = $opts{max_worker} // die "max_worker required"; 
+	$max_worker         = $opts{max_worker} // die "max_worker required";
 	$max_forks_per_task = $opts{max_forks_per_task} // die "max_forks_per_task required";
-	my $max_receiver    = $opts{max_receiver} // die "max_receiver required"; 
-	...
+	my $max_receiver    = $opts{max_receiver} // die "max_receiver required";
+
+	my $server = IO::Socket::INET->new(); 
 	# Инициализируем сервер my $server = IO::Socket::INET->new(...);
 	# Инициализируем очередь my $q = Local::TCP::Calc::Server::Queue->new(...);
   	...
@@ -32,9 +34,9 @@ sub start_server {
 	# Начинаем accept-тить подключения
 	# Проверяем, что количество принимающих форков не вышло за пределы допустимого ($max_receiver)
 	# Если все нормально отвечаем клиенту TYPE_CONN_OK() в противном случае TYPE_CONN_ERR()
-	# В каждом форке читаем сообщение от клиента, анализируем его тип (TYPE_START_WORK(), TYPE_CHECK_WORK()) 
+	# В каждом форке читаем сообщение от клиента, анализируем его тип (TYPE_START_WORK(), TYPE_CHECK_WORK())
 	# Не забываем проверять количество прочитанных/записанных байт из/в сеть
-	# Если необходимо добавляем задание в очередь (проверяем получилось или нет) 
+	# Если необходимо добавляем задание в очередь (проверяем получилось или нет)
 	# Если пришли с проверкой статуса, получаем статус из очереди и отдаём клиенту
 	# В случае если статус DONE или ERROR возвращаем на клиент содержимое файла с результатом выполнения
 	# После того, как результат передан на клиент зачищаем файл с результатом

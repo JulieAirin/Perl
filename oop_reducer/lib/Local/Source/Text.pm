@@ -31,7 +31,7 @@ sub next {
     $self->{cur_index} += 1;
     return ${$self->rows}[$self->cur_index];
   } else {
-    return 'undef';
+    return undef;
   }
 }
 

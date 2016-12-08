@@ -11,6 +11,8 @@ use DDP;
 use Encode;
 use utf8;
 
+my $flag = 0;
+
 sub hash {
 	my $source = shift;
 	my %res = ();
@@ -29,12 +31,12 @@ sub hash {
 		\{.*\}
 		|\[.*\]
 		|("
-			(?:\\["\/bfnrt]
+			(?:\\[\\"\/bfnrt]
     	|\\u[0-9a-fA-F]{4}
 			|\w
 			|\s
 			|\d
-			|@|\{|\}|\[|\]|:|\+
+			|:|\+|@|\[|\]|\{|\}
 			|\,
 			)*
 		")
@@ -65,13 +67,13 @@ sub array {
 		\{.*\}
 		|\[.*\]
 		|("
-			(?:\\["\/bfnrt]
+			(?:\\[\\"\/bfnrt]
     	|\\u[0-9a-fA-F]{4}
 			|\w
 			|\s
 			|\d
 			|\,
-			|@|\{|\}|\[|\]|:|\+
+			|:|\+|@|\[|\]|\{|\}
 			)*
 			")
 		|-{0,1}([1-9][0-9]*|0)(\.[0-9]*){0,1}([eE][\+-]{0,1}[0-9]){0,1}
@@ -94,23 +96,23 @@ sub array {
 sub string {
 	my $source = shift;
 	$source =~ /"
-		((\\["\/bfnrt]
+		((\\[\\"\/bfnrt]
 		|\\u[0-9a-fA-F]{4}
 		|\w
 		|\d
 		|\s
-		|@|\{|\}|\[|\]|:|\+|\,
+		|:|\+|\,|@|\[|\]|\{|\}
 		)*)
 		"/x;
 	my $res = $1;
-	$res =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/eg;
-	$res =~ s/(\\b)/chr(8)/eg;
-	$res =~ s/(\\f)/chr(12)/eg;
-	$res =~ s/(\\n)/chr(10)/eg;
-	$res =~ s/(\\r)/chr(13)/eg;
-	$res =~ s/(\\t)/chr(9)/eg;
+	$res =~ s/(?<!\\)\\u([0-9A-Fa-f]{4})/chr hex $1/eg;
+	$res =~ s/(?<!\\)(\\b)/chr(8)/eg;
+	$res =~ s/(?<!\\)(\\f)/chr(12)/eg;
+	$res =~ s/(?<!\\)(\\r)/chr(13)/eg;
+	$res =~ s/(?<!\\)(\\t)/chr(9)/eg;
 	$res =~ s/\\"/"/g;
 	$res =~ s/\\\//\//g;
+	$res =~ s/\\\\/\\/g;
 	return $res;
 }
 
@@ -125,24 +127,27 @@ sub test_source {
 	my @ares;
 	my %hres;
 
-	if ( $source =~ /^\{(.*)\}$/s ) {
+	if ( $source =~ /^\s*\{(.*)\}\s*$/s ) {
 		%hres = hash ($1);
+		$flag = 1;
 		return \%hres;
-	} elsif ( $source =~ /^\[(.*)\]$/s ) {
+	} elsif ( $source =~ /^\s*\[(.*)\]\s*$/s ) {
 		@ares = array ($1);
+		$flag = 1;
 		return \@ares;
-	} elsif ( $source =~ /^"
-		((\\["\/bfnrt]
+	} elsif ( $source =~ /^\s*"
+		((\\[\\"\/bfnrt]
 		|\\u[0-9a-fA-F]{4}
 		|\w
 		|\s
 		|\d
-		|@|\{|\}|\[|\]|:|\+
+		|:|\+|@|\[|\]|\{|\}
 		|\,
-		)*)"$/xs ) {
+		)*)"\s*$/xs ) {
 		$res = string ($1);
+		$flag = 1;
 		return $res;
-	} elsif ( $source =~ /^(?<res>-{0,1}([1-9][0-9]*|0)(\.[0-9]*){0,1}([eE][\+-]{0,1}[0-9]){0,1})$/s ) {
+	} elsif ( ( $source =~ /^\s*(?<res>-{0,1}([1-9][0-9]*|0)(\.[0-9]*){0,1}([eE][\+-]{0,1}[0-9]){0,1})\s*$/s )&&( $flag == 1 ) ) {
 		$res = number ($+{res});
 		return $res;
 	} else {
